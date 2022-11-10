@@ -13,12 +13,12 @@ const uuidv4 = require('uuid/v4');
 export function createTodoForUser(createTodoRequest: CreateTodoRequest, jwtToken: string): Promise<TodoItem> {
     const userId = parseUserId(jwtToken);
     const todoId =  uuidv4();
-    const bucketName = process.env.ATTACHMENT_S3_BUCKET;
+    //const bucketName = process.env.ATTACHMENT_S3_BUCKET;
     
     return todoAccess.createTodoForUser({
         userId: userId,
         todoId: todoId,
-        attachmentUrl:  `https://${bucketName}.s3.amazonaws.com/${todoId}`, 
+        //attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${todoId}`, 
         createdAt: new Date().getTime().toString(),
         done: false,
         ...createTodoRequest,
