@@ -7,6 +7,8 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 
 provider:
   name: aws
@@ -32,6 +34,42 @@ provider:
   logs:
     # Enable API Gateway logs
     restApi: true
+
+custom:
+  documentation:
+    api:
+      info:
+        version: '1.0.0'
+        title: serverless-api
+        description: serverless-api
+    models:
+      - name: CreateTodoRequest
+        contentType: "application/json"
+        schema:
+          required:
+            - name
+            - dueDate
+          properties:
+            name:
+              minLength: 1
+              type: string
+            dueDate:
+              type: string
+      - name: UpdateTodoRequest
+        contentType: "application/json"
+        schema:
+          required:
+            - name
+            - dueDate
+            - done
+          properties:
+            name:
+              minLength: 1
+              type: string
+            dueDate:
+              type: string
+            done:
+              type: boolean
 
   iam:
     role:
@@ -80,6 +118,7 @@ functions:
           request:
             schemas:
               application/json: ${file(models/create-todo-model.json)}
+          reqValidatorName: RequestBodyValidator
     iamRoleStatements:
     - Effect: Allow
       Action:
@@ -96,6 +135,7 @@ functions:
           path: todos/{todoId}
           authorizer: Auth
           cors: true
+          reqValidatorName: RequestBodyValidator
     iamRoleStatements:
     - Effect: Allow
       Action:
@@ -198,6 +238,14 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL # What attributes will be copied to an index
+    onlyBody:
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'only-body'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
               
     # TODO: Complete the bucket properties below. 
     # Do not forget to add the CorsConfiguration propoerty
@@ -219,6 +267,15 @@ resources:
                 - DELETE
                 - HEAD
               MaxAge: 3000
+
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
 
 
     # TODO: Complete the policy below and attach it to the bucket defined above
