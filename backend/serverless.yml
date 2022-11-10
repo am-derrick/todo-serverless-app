@@ -115,9 +115,11 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          request:
-            schemas:
-              application/json: ${file(models/create-todo-model.json)}
+          documentation:
+            summary: "Create a new todo item"
+            description: "Create a new todo item"
+            requestModels:
+              "application/json": CreateTodoRequest
           reqValidatorName: RequestBodyValidator
     iamRoleStatements:
     - Effect: Allow
@@ -135,6 +137,11 @@ functions:
           path: todos/{todoId}
           authorizer: Auth
           cors: true
+          documentation:
+            summary: "Update a todo item"
+            description: "Update a todo item"
+            requestModels:
+              "application/json": UpdateTodoRequest
           reqValidatorName: RequestBodyValidator
     iamRoleStatements:
     - Effect: Allow
