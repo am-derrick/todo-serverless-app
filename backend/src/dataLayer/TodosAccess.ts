@@ -27,8 +27,7 @@ export class TodoAccess {
             ExpressionAttributeNames: attrExpressionName,
             ExpressionAttributeValues: attrExpressionValue
         };
-        const result = 
-            await this.dynamoDocClient.query(
+        const result = await this.dynamoDocClient.query(
                 paramPayload
             ).promise();
 
@@ -42,8 +41,7 @@ export class TodoAccess {
             TableName: this.todoTable, 
             Item: todoItem,
         };
-        const result = 
-            await this.dynamoDocClient.put(
+        const result = await this.dynamoDocClient.put(
                 paramPayload
             ).promise();
 
