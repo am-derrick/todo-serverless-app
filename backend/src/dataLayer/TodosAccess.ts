@@ -33,6 +33,9 @@ export class TodoAccess {
 
         console.log(`Getting Todo: ${result}`);
 
+        console.log(this.bucketClient)
+        console.log(this.bucketName)
+
         return result.Items as TodoItem[];
     }
 
@@ -98,11 +101,25 @@ export class TodoAccess {
         return null;
     }
 
-    async createPresignedUrl(todoId: string): Promise<string> {
+    async updateAttachmentUrl(userId: string, todoId: string, attachmentUrl: string): Promise<void> {
+        await this.dynamoDocClient.update({
+          TableName: this.todoTable,
+          Key: {
+            userId,
+            todoId
+          },
+          UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+          ExpressionAttributeValues: {
+            ':attachmentUrl': attachmentUrl
+          }
+        }).promise()
+      }
+
+    /* async createPresignedUrl(attachmentId: string): Promise<string> {
         const url = this.bucketClient.getSignedUrl(
             'putObject', {
                 Bucket: this.bucketName,
-                Key: todoId,
+                Key: attachmentId,
                 Expires: 1000,
             }
         );
@@ -111,4 +128,8 @@ export class TodoAccess {
 
         return url as string;
     }
+
+    async getAttachmentBucketUrl(attachmentId: string): Promise<string> {
+        return `https://${this.bucketName}.s3.amazonaws.com/${attachmentId}`
+      } */
 }

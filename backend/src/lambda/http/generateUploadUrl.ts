@@ -1,14 +1,18 @@
 import 'source-map-support/register'
 import {APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler} from 'aws-lambda'
-import { createPresignedUrl } from "../../businessLogic/todo";
+import { addAttachmentToTodo, createPresignedUrl } from "../../businessLogic/todo";
+import { getUserId } from '../utils';
+import * as uuid from "uuid"
 
 export const handler: APIGatewayProxyHandler = 
 async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
         const todoId = event.pathParameters.todoId;
-
+        const userId = getUserId(event)
+        const attachmentId = uuid.v4()
         // TODO: Return a presigned URL to upload a file for a TODO item with the provided id        
-        const signedURL = await createPresignedUrl(todoId);
+        const signedURL = createPresignedUrl(attachmentId);
+        await addAttachmentToTodo(userId, todoId, attachmentId)
 
         return {
             statusCode: 202,

@@ -4,6 +4,7 @@ import { CreateTodoRequest } from "../requests/CreateTodoRequest";
 import { TodoItem } from "../models/TodoItem";
 import { UpdateTodoRequest } from "../requests/UpdateTodoRequest";
 import { TodoUpdate } from "../models/TodoUpdate";
+import { getAttachmentBucketUrl, createAttachmentPresignedUrl } from '../helpers/attachmentUtils';
 
 
 // TODO: Implement business Logic
@@ -31,8 +32,14 @@ export function updateTodoForUser(updateTodoRequest: UpdateTodoRequest, todoId: 
     return todoAccess.updateTodoForUser(updateTodoRequest, todoId, userId);
 }
 
-export function createPresignedUrl(todoId: string): Promise<string> {
-    return todoAccess.createPresignedUrl(todoId);
+export function createPresignedUrl(attachmentId: string): string {
+    return createAttachmentPresignedUrl(attachmentId);
+}
+
+export async function addAttachmentToTodo(userId: string, todoId: string, attachmentId: string): Promise<void> {
+const attachmentUrl = getAttachmentBucketUrl(attachmentId);
+//logger.info('Get attachment URL: ' + attachmentUrl)
+await todoAccess.updateAttachmentUrl(userId, todoId, attachmentUrl)
 }
 
 export async function getTodoForUser(jwtToken: string): Promise<TodoItem[]> {
